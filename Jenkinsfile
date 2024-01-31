@@ -28,7 +28,7 @@ spec:
     environment {
         DOCKER_HUB_REPO = 'divyanshujain11'
         BUILD_DATE = sh(script: 'date "+%Y-%m-%d"', returnStdout: true).trim()
-        Git_clone_repo_url= "https://github.com/divyanshujainSquareops/voting_application-docker-build-push-jenkinsfile-worker"
+        Git_clone_repo_url= "https://github.com/divyanshujainSquareops/voting_application-docker-build-push-jenkinsfile-worker.git"
         Git_helm_repo_url= "https://github.com/divyanshujainSquareops/voting_application-helm-argocd.git"
         branch_name= "main"
         credentialsId= "github"
@@ -38,10 +38,11 @@ spec:
     }
 
     stages {
-        stage('Clone worker repo in Kaniko Container') {
+        stage('Clone in Kaniko Container') {
             steps {
                 script {
                     container('kaniko') {
+                        echo "${branch_name},${credentialsId},${Git_clone_repo_url}"
                         git branch: "${branch_name}", credentialsId: "${credentialsId}", url: "${Git_clone_repo_url}"
                         echo "Repository cloned inside Kaniko container"
                     }
@@ -59,7 +60,7 @@ spec:
                 }
             }
         }
-        stage('worker helm values update and push') {
+        stage('Helm Values Update and Push') {
           agent {
             kubernetes {
                 yaml """
@@ -89,7 +90,7 @@ spec:
                     // Clone Git repo with credentials
                     
                    
-                    git branch: ${branch_name}, credentialsId: ${credentialsId}, url: ${Git_helm_repo_url}
+                    git branch: "${branch_name}", credentialsId: "${credentialsId}", url: "${Git_helm_repo_url}"
                      withCredentials([usernamePassword(credentialsId: 'github', usernameVariable: 'GIT_USER_NAME', passwordVariable: 'PASSWORD')]) {
                         sh '''
                             cd ./vote/
