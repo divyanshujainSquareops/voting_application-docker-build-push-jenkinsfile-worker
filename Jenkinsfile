@@ -42,8 +42,7 @@ spec:
             steps {
                 script {
                     container('kaniko') {
-                        echo "${branch_name},${credentialsId},${Git_clone_repo_url}"
-                        git branch: '${branch_name}', credentialsId: ${credentialsId} , url: '${Git_clone_repo_url}'
+                        git branch: "${branch_name}", credentialsId: "${credentialsId}", url: "${Git_clone_repo_url}"
                         echo "Repository cloned inside Kaniko container"
                     }
                 }
@@ -91,7 +90,7 @@ spec:
                     
                    
                     git branch: ${branch_name}, credentialsId: ${credentialsId}, url: ${Git_helm_repo_url}
-                     withCredentials([usernamePassword(credentialsId: 'github', usernameVariable: 'USER_NAME', passwordVariable: 'PASSWORD')]) {
+                     withCredentials([usernamePassword(credentialsId: 'github', usernameVariable: 'GIT_USER_NAME', passwordVariable: 'PASSWORD')]) {
                         sh '''
                             cd ./vote/
                             yq e -i '.image.tag = "'$BUILD_NUMBER'"' values.yaml
@@ -101,7 +100,7 @@ spec:
                             git config --global user.name ${user_name}
                             git add .
                             git commit -m "commit=\$JOB_NAME-\$BUILD_NUMBER-\$BUILD_DATE"
-                            git push https://${USER_NAME}:${PASSWORD}@github.com/divyanshujainSquareops/voting_application-helm-argocd.git main
+                            git push https://${GIT_USER_NAME}:${PASSWORD}@github.com/divyanshujainSquareops/voting_application-helm-argocd.git main
                         '''                      
                     }
                 }
