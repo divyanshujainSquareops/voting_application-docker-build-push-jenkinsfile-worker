@@ -21,22 +21,6 @@ spec:
       volumeMounts:
       - name: kaniko-secret
         mountPath: /kaniko/.docker
-    - name: kaniko-2
-      image: gcr.io/kaniko-project/executor:debug
-      command:
-        - /busybox/cat
-      tty: true
-      volumeMounts:
-      - name: kaniko-secret
-        mountPath: /kaniko/.docker
-    - name: kaniko-3
-      image: gcr.io/kaniko-project/executor:debug
-      command:
-        - /busybox/cat
-      tty: true
-      volumeMounts:
-      - name: kaniko-secret
-        mountPath: /kaniko/.docker
 """
         }
     }
