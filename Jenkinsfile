@@ -42,7 +42,6 @@ spec:
             steps {
                 script {
                     container('kaniko') {
-                        echo "${branch_name},${credentialsId},${Git_clone_repo_url}"
                         git branch: "${branch_name}", credentialsId: "${credentialsId}", url: "${Git_clone_repo_url}"
                         echo "Repository cloned inside Kaniko container"
                     }
@@ -54,7 +53,7 @@ spec:
                 script {
                     container('kaniko') {
                         // Build and push Docker image using Kaniko
-                        sh "/kaniko/executor --dockerfile `pwd`/vote/Dockerfile --context=`pwd` --destination=${DOCKER_HUB_REPO}/votingapp-vote:${BUILD_NUMBER}"
+                        sh "/kaniko/executor --dockerfile `pwd`/worker/Dockerfile --context=`pwd` --destination=${DOCKER_HUB_REPO}/votingapp-worker:${BUILD_NUMBER}"
                         echo "Image vote build completed"
                     }
                 }
@@ -93,7 +92,7 @@ spec:
                     git branch: "${branch_name}", credentialsId: "${credentialsId}", url: "${Git_helm_repo_url}"
                      withCredentials([usernamePassword(credentialsId: 'github', usernameVariable: 'GIT_USER_NAME', passwordVariable: 'PASSWORD')]) {
                         sh '''
-                            cd ./vote/
+                            cd ./worker/
                             yq e -i '.image.tag = "'$BUILD_NUMBER'"' values.yaml
                             cd ..
                             git config --global --add safe.directory /home/jenkins/agent/workspace/${JOB_NAME}
