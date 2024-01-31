@@ -31,7 +31,7 @@ spec:
     }
 
     stages {
-        stage('Clone in Kaniko Container') {
+        stage('Worker-repo Clone in Kaniko Container') {
             steps {
                 script {
                     container('kaniko') {
@@ -52,7 +52,7 @@ spec:
                 }
             }
         }
-        stage('Helm Values Update and Push') {
+        stage('Worker Helm Values Update and Push') {
           agent {
             kubernetes {
                 yaml """
@@ -85,14 +85,9 @@ spec:
                     git branch: 'main', credentialsId: 'github', url: 'https://github.com/divyanshujainSquareops/voting_application-helm-argocd.git'
                      withCredentials([usernamePassword(credentialsId: 'github', usernameVariable: 'USER_NAME', passwordVariable: 'PASSWORD')]) {
                         sh '''
-                            echo "BUILD_DATE: ${BUILD_DATE}"
                             cd ./worker/
                             yq e -i '.image.tag = "'$BUILD_NUMBER'"' values.yaml
-                            cat values.yaml
                             cd ..
-
-                            ls -la
-                            pwd
                             git config --global --add safe.directory /home/jenkins/agent/workspace/${JOB_NAME}
                             git config --global user.email "divyanshu.jain@squareops.com"
                             git config --global user.name "Divyanshu jain"
